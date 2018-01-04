@@ -409,6 +409,11 @@ char *get_real_path(char **arg, char **path)
 	char *res;
 	int len = my_strlen(arg[0]);
 
+	if (arg[0][0] == '.' || arg[0][0] == '/') {
+	        res = my_malloc(len + 1);
+		my_strcpy(res, arg[0]);
+		return (res);
+	}
 	for (int i = 0; path[i]; i = i + 1) {
 		res = my_malloc(len + my_strlen(path[i]) + 2);
         	my_strcat(res, path[i]);
