@@ -5,6 +5,7 @@
 ** Main file.
 */
 
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -420,6 +421,15 @@ char *get_real_path(char **arg, char **path)
 	return (NULL);
 }
 
+int is_forking(int val)
+{
+	static int is_forking = 0;
+
+	if (val != 2)
+		is_forking = val;
+	return (is_forking);
+}
+
 void launch_programm(char *good_path, char **arg, env_t *env)
 {
 	char **tab_env = build_env_tab(env);
@@ -430,14 +440,27 @@ void launch_programm(char *good_path, char **arg, env_t *env)
 	if (pid == 0) {
 		execve(good_path, arg, tab_env);
         } else {
+		is_forking(1);
 		tpid = wait(&status);
 		while (tpid != pid)
 			tpid = wait(&status);
 		if (tpid == pid) {
+			is_forking(0);
 			free(tab_env);
 			return;
 		}
 	}
+}
+
+void handler(int sig)
+{
+	(void) sig;
+	signal(SIGINT, &handler);
+	if (is_forking(2))
+		my_putstr("\n");
+	else
+		my_putstr("\n$>");
+	
 }
 
 void mysh(env_t **env, char *cmd)
@@ -463,6 +486,7 @@ int main(int argc, char *argv[], char **env)
         char *s;
 	env_t *l_env = NULL;
 
+	signal(SIGINT, &handler);
 	build_env_list(&l_env, env);
         my_putstr("$>");
 	s = get_next_line(0);
