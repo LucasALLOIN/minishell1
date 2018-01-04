@@ -1,0 +1,12 @@
+*~
+*#
+\#*#
+\#*
+*.o
+*.a
+*.out
+*.editorconfig
+*.gcda
+*.gcno
+units
+mysh
