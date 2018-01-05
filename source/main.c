@@ -182,16 +182,16 @@ void modifie_env_var(env_t *env, char *to_add)
 	free(var);
 }
 
-void add_env_to_list(env_t **head, char **to_add)
+void add_env_to_list(env_t **head, char *to_add, char *val)
 {
 	env_t *new_node = malloc(sizeof(env_t));
 	env_t *last = *head;
-	char *tmp = my_malloc(my_strlen(to_add[1]) + my_strlen(to_add[2]) + 2);
+	char *tmp = my_malloc(my_strlen(to_add) + my_strlen(val) + 2);
 
-	new_node->var = my_malloc(my_strlen(to_add[1]) + my_strlen(to_add[2]) + 2);
-	my_strcat(tmp, to_add[1]);
+	new_node->var = my_malloc(my_strlen(to_add) + my_strlen(val) + 2);
+	my_strcat(tmp, to_add);
 	my_strcat(tmp, "=");
-	my_strcat(tmp, to_add[2]);
+	my_strcat(tmp, val);
 	my_strcpy(new_node->var, tmp);
 	free(tmp);
 	new_node->next = NULL;
@@ -227,13 +227,13 @@ void remove_env(env_t **head, char *arg)
 
 void add_env_to_list_manager(env_t **head, char **arg)
 {
-	if (!is_env_valid(arg[1]) || !is_env_valid(arg[2]))
+	if (!is_env_valid(arg[1]))
 		return;
 	if ((my_getenv(*head, arg[1])) != NULL) {
 		remove_env(head, arg[1]);
-		add_env_to_list(head, arg);
+		add_env_to_list(head, arg[1], arg[2]);
 	} else
-		add_env_to_list(head, arg);
+		add_env_to_list(head, arg[1], arg[2]);
 }
 
 int is_unset_valid(char *to_rm)
@@ -306,24 +306,44 @@ void show_env(char **env)
 	}
 }
 
-int verify_path(char *path, env_t *env)
+int verify_path(char *path, env_t **env)
 {
 	int result;
+	char buf[256];
 
 	if (path == NULL) {
-		chdir(my_getenv(env, "HOME"));
+		remove_env(env, "OLDPWD");
+		add_env_to_list(env, "OLDPWD", my_getenv(*env, "PWD"));
+		chdir(my_getenv(*env, "HOME"));
+		remove_env(env, "PWD");
+		add_env_to_list(env, "PWD", getcwd(buf, 256));
+		return (0);
 	}
 	result = access(path, F_OK);
-	if (result == 0)
+	if (result == 0 || my_strcmp(path, "-") == 0)
 		return (1);
 	return (0);
 }
 
-void my_cd(char *path, env_t *env)
+void my_cd(char *path, env_t **env)
 {
+	char buf[256];
+
 	if (!verify_path(path, env))
 		return;
+	if (my_strcmp(path, "-") == 0) {
+	        chdir(my_getenv(*env, "OLDPWD"));
+		remove_env(env, "OLDPWD");
+		add_env_to_list(env, "OLDPWD", my_getenv(*env, "PWD"));
+		remove_env(env, "PWD");
+		add_env_to_list(env, "PWD", getcwd(buf, 256));
+		return;
+	}
+	remove_env(env, "OLDPWD");
+	add_env_to_list(env, "OLDPWD", getcwd(buf, 256));
 	chdir(path);
+	remove_env(env, "PWD");
+        add_env_to_list(env, "PWD", getcwd(buf, 256));
 }
 
 int check_builtin(env_t **env, char **path, char **arg, char *cmd)
@@ -344,7 +364,7 @@ int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 		remove_from_env(env, arg);
 		return (1);
 	} else if (my_strcmp(arg[0], "cd") == 0) {
-		my_cd(arg[1], *env);
+		my_cd(arg[1], env);
 		return (1);
 	}
 	return (0);
@@ -469,8 +489,27 @@ void handler(int sig)
 	if (is_forking(2))
 		my_putstr("\n");
 	else
-		my_putstr("\n$>");
+		my_putstr("\n$> ");
 	
+}
+
+void tild_replacer(env_t *env, char **arg)
+{
+	int i = 0;
+	int ln = 0;
+	char *res;
+
+	while (arg[i]) {
+		ln = my_strlen(arg[i]);
+		if (arg[i][0] == '~') {
+			res = malloc(my_strlen(my_getenv(env, "HOME")) + 1 + ln);
+			my_strcpy(res, my_getenv(env, "HOME"));
+			my_strcat(res, arg[i] + 1);
+			free(arg[i]);
+			arg[i] = res;
+		}
+		i = i + 1;
+	}
 }
 
 void mysh(env_t **env, char *cmd)
@@ -479,6 +518,7 @@ void mysh(env_t **env, char *cmd)
 	char **path = my_str_to_array(my_getenv(*env, "PATH"), ':');
 	char *good_path;
 
+	tild_replacer(*env, arg);
 	if (!check_builtin(env, path, arg, cmd)) {
 		good_path = get_real_path(arg, path);
 		if (good_path != NULL)
@@ -491,19 +531,19 @@ void mysh(env_t **env, char *cmd)
 
 int main(int argc, char *argv[], char **env)
 {
-	(void)argc;
-	(void)argv;
         char *s;
 	env_t *l_env = NULL;
 
+	(void) argc;
+	(void) argv;
 	signal(SIGINT, &handler);
 	build_env_list(&l_env, env);
-        my_putstr("$>");
+        my_putstr("$> ");
 	s = get_next_line(0);
 	while (s) {
 		if (check_cmd(s))
 			mysh(&l_env, s);
-		my_putstr("$>");
+		my_putstr("$> ");
         	free(s);
 		s = get_next_line(0);
 	}
