@@ -418,7 +418,7 @@ int env_len(env_t *list)
 
 char **build_env_tab(env_t *list)
 {
-	char **res = malloc(sizeof(char *) * env_len(list) + 1);
+	char **res = malloc(sizeof(char *) * (env_len(list) + 1));
 	int i = 0;
 
 	while (list != NULL) {
@@ -426,6 +426,7 @@ char **build_env_tab(env_t *list)
 		i = i + 1;
 		list = list->next;
 	}
+	res[i] = 0;
 	return (res);
 }
 
