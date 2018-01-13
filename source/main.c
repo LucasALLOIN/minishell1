@@ -384,7 +384,7 @@ char **my_str_to_array(char *cmd, char to_s)
 {
 	int z = 0;
 	int y = 0;
-	char **res = malloc(sizeof(char *) * (count_to_split(cmd, to_s)) + 1);
+	char **res = malloc(sizeof(char *) * (count_to_split(cmd, to_s) + 1));
 	char *st = my_malloc(sizeof(char) * (my_strlen(cmd)) + 1);
 
         for (int i = 0; cmd[i]; i = i + 1) {
