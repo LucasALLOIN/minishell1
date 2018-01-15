@@ -28,4 +28,8 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
+docker:
+	sudo docker pull epitechcontent/epitest-docker
+	sudo docker run -it -v `pwd`:/home/epitest -w /home/epitest epitechcontent/epitest-docker /bin/bash
+
 re: fclean all

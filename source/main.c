@@ -356,6 +356,7 @@ int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 		free_env(env);
 		free_tab(arg);
 		free_tab(path);
+		my_putstr("exit\n");
 		exit(0);
 	} else if (my_strcmp(arg[0], "setenv") == 0) {
 		add_env_to_list_manager(env, arg);
@@ -541,12 +542,16 @@ int main(int argc, char *argv[], char **env)
 	build_env_list(&l_env, env);
         my_putstr("$> ");
 	s = get_next_line(0);
+	if (s == NULL)
+		my_putstr("exit\n");
 	while (s) {
 		if (check_cmd(s))
 			mysh(&l_env, s);
 		my_putstr("$> ");
         	free(s);
 		s = get_next_line(0);
+		if (s == NULL)
+			my_putstr("exit\n");
 	}
 	free_env(&l_env);
         return (0);
