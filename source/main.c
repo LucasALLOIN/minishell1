@@ -529,6 +529,10 @@ void mysh(env_t **env, char *cmd)
 		good_path = get_real_path(arg, path);
 		if (good_path != NULL)
 			launch_programm(good_path, arg, *env);
+		else {
+			my_putstr(arg[0]);
+			my_putstr(": Command not found\n");
+		}
 		free(good_path);
 	}
 	free_tab(arg);
