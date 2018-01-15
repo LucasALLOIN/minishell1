@@ -8,5 +8,7 @@
 *.editorconfig
 *.gcda
 *.gcno
+vgcore*
+mouli_silvain
 units
 mysh

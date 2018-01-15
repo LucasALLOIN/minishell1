@@ -18,6 +18,8 @@ void free_tab(char **tab)
 {
         int i = 0;
 
+	if (tab == NULL)
+		return;
 	for (i = 0; tab[i] != 0; i = i + 1)
                 free(tab[i]);
         free(tab);
@@ -69,7 +71,6 @@ int is_in_env_entry(char *env, char *elem)
 int is_in_env(env_t *env, char *elem)
 {
 	while (env != NULL) {
-		my_putstr(elem);
 		if (is_in_env_entry(env->var, elem))
 			return (1);
 		env = env->next;
@@ -389,12 +390,11 @@ char **my_str_to_array(char *cmd, char to_s)
 	char *st = my_malloc(sizeof(char) * (my_strlen(cmd)) + 1);
 
         for (int i = 0; cmd[i]; i = i + 1) {
-		if (cmd[i] != to_s) {
+	        if (cmd[i] != to_s) {
 			st[z] = cmd[i];
 			z = z + 1;
 		}
-		for (;cmd[i + 1] == to_s; i = i + 1);
-		if (cmd[i] == to_s || !cmd[i + 1]) {
+	        if (cmd[i] == to_s || !cmd[i + 1]) {
 			z = 0;
 			res[y] = st;
 			st = my_malloc(sizeof(char *) * (my_strlen(cmd)) + 1);
@@ -436,6 +436,8 @@ char *get_real_path(char **arg, char **path)
 	char *res;
 	int len = my_strlen(arg[0]);
 
+	if (path == NULL)
+		return (NULL);
 	if (arg[0][0] == '.' || arg[0][0] == '/') {
 	        res = my_malloc(len + 1);
 		my_strcpy(res, arg[0]);
@@ -517,9 +519,11 @@ void tild_replacer(env_t *env, char **arg)
 void mysh(env_t **env, char *cmd)
 {
 	char **arg = my_str_to_array(cmd, ' ');
-	char **path = my_str_to_array(my_getenv(*env, "PATH"), ':');
+	char **path = NULL;
 	char *good_path;
 
+	if (my_getenv(*env, "PATH") != NULL)
+		path = my_str_to_array(my_getenv(*env, "PATH"), ':');
 	tild_replacer(*env, arg);
 	if (!check_builtin(env, path, arg, cmd)) {
 		good_path = get_real_path(arg, path);
@@ -545,6 +549,7 @@ int main(int argc, char *argv[], char **env)
 	if (s == NULL)
 		my_putstr("exit\n");
 	while (s) {
+		s = my_strclear(s);
 		if (check_cmd(s))
 			mysh(&l_env, s);
 		my_putstr("$> ");
