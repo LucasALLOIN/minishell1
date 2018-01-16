@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
 #include "gnl.h"
 #include "my.h"
 #include "main.h"
@@ -102,7 +105,7 @@ char *my_malloc(unsigned int size)
 {
         char *mall = malloc(size);
 
-        for (unsigned int i = 0; i < size; i = i + 1)
+        for (unsigned int i = 0; i <= size; i = i + 1)
                 mall[i] = '\0';
         return (mall);
 }
@@ -307,11 +310,28 @@ void show_env(char **env)
 	}
 }
 
+void display_cd_error(char *path)
+{
+	my_putstr(path);
+        switch (errno) {
+	case EACCES:
+		my_putstr(": Permission denied.\n");
+		break;
+	case ENOENT:
+		my_putstr(": No such file or directory.\n");
+		break;
+	case ENOTDIR:
+		my_putstr(": Not a directory.\n");
+	}
+}
+
 int verify_path(char *path, env_t **env)
 {
-	int result;
 	char buf[256];
-
+	DIR *dir;
+        
+	(void) dir;
+	errno = 0;
 	if (path == NULL) {
 		remove_env(env, "OLDPWD");
 		add_env_to_list(env, "OLDPWD", my_getenv(*env, "PWD"));
@@ -320,9 +340,10 @@ int verify_path(char *path, env_t **env)
 		add_env_to_list(env, "PWD", getcwd(buf, 256));
 		return (0);
 	}
-	result = access(path, F_OK);
-	if (result == 0 || my_strcmp(path, "-") == 0)
+	dir = opendir(path);
+	if (errno == 0 || my_strcmp(path, "-") == 0)
 		return (1);
+	display_cd_error(path);
 	return (0);
 }
 
