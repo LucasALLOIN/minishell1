@@ -40,6 +40,15 @@ void free_env(env_t **env)
 	}
 }
 
+int tab_lengh(char **tab)
+{
+	int i = 0;
+
+	while (tab[i])
+		i = i + 1;
+	return (i);
+}
+
 char *get_var_name(char *var)
 {
 	char *res;
@@ -229,9 +238,25 @@ void remove_env(env_t **head, char *arg)
 	free(tmp);
 }
 
+int is_empty_setenv(env_t **head, char **arg)
+{
+	if (tab_lengh(arg) == 1) {
+		display_env(*head);
+		return (1);
+	} else if (tab_lengh(arg) == 2) {
+		if ((my_getenv(*head, arg[1])) != NULL) {
+			remove_env(head, arg[1]);
+			add_env_to_list(head, arg[1], "");
+		} else
+			add_env_to_list(head, arg[1], "");
+		return (1);
+	}
+	return (0);
+}
+
 void add_env_to_list_manager(env_t **head, char **arg)
 {
-	if (!is_env_valid(arg[1]))
+	if (is_empty_setenv(head, arg) || !is_env_valid(arg[1]))
 		return;
 	if ((my_getenv(*head, arg[1])) != NULL) {
 		remove_env(head, arg[1]);
