@@ -36,7 +36,7 @@ char *my_strclear(char *str)
 	int i = 0;
 	int z = 0;
 	int check = 0;
-	char *res = my_malloc(my_strlen(str));
+	char *res = my_malloc(my_strlen(str) + 1);
 
 	while (str[i]) {
 		check = is_space_first(str, i);
@@ -50,6 +50,7 @@ char *my_strclear(char *str)
 		}
 		i = i + 1;
 	}
+	str[z] = 0;
 	free(str);
 	return (res);
 }

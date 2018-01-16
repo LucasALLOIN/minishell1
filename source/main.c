@@ -114,7 +114,7 @@ char *my_malloc(unsigned int size)
 {
         char *mall = malloc(size);
 
-        for (unsigned int i = 0; i <= size; i = i + 1)
+        for (unsigned int i = 0; i < size; i = i + 1)
                 mall[i] = '\0';
         return (mall);
 }
