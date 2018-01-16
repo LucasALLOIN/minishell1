@@ -50,7 +50,6 @@ char *my_strclear(char *str)
 		}
 		i = i + 1;
 	}
-	str[z] = 0;
 	free(str);
 	return (res);
 }
