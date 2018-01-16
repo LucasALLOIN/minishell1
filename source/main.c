@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "get_next_line.h"
+#include "gnl.h"
 #include "my.h"
 #include "main.h"
 
