@@ -494,7 +494,7 @@ char *get_real_path(char **arg, char **path)
         	my_strcat(res, path[i]);
 		my_strcat(res, "/");
 		my_strcat(res, arg[0]);
-		if (access(res, R_OK) == 0)
+		if (access(res, X_OK) == 0)
 			return (res);
 		free(res);
 	}
