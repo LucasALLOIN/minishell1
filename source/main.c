@@ -531,7 +531,7 @@ void mysh(env_t **env, char *cmd)
 			launch_programm(good_path, arg, *env);
 		else {
 			my_putstr(arg[0]);
-			my_putstr(": Command not found\n");
+			my_putstr(": Command not found.\n");
 		}
 		free(good_path);
 	}
