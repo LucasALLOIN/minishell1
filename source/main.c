@@ -40,6 +40,11 @@ void free_env(env_t **env)
 	}
 }
 
+void my_puterror(char *str)
+{
+	write(2, str, my_strlen(str));
+}
+
 int tab_lengh(char **tab)
 {
 	int i = 0;
@@ -152,7 +157,7 @@ int is_env_valid(char *to_verif)
 
 	if (!(to_verif[0] >= 'a' && to_verif[0] <= 'z') || \
 	(to_verif[0] >= 'A' && to_verif[0] <= 'Z')) {
-		my_putstr("setenv: Variable name must begin with a letter.\n");
+		my_puterror("setenv: Variable name must begin with a letter.\n");
 		return (0);
 	}
 	while (to_verif[i]) {
@@ -161,8 +166,8 @@ int is_env_valid(char *to_verif)
 		(to_verif[i] >= '0' && to_verif[i] <= '9'))
 			i = i + 1;
 		else {
-			my_putstr("setenv: Variable name must ");
-			my_putstr("contain alphanumeric characters.\n");
+			my_puterror("setenv: Variable name must ");
+			my_puterror("contain alphanumeric characters.\n");
 			return (0);
 		}
 	}
@@ -346,16 +351,16 @@ void show_env(char **env)
 
 void display_cd_error(char *path)
 {
-	my_putstr(path);
+	my_puterror(path);
         switch (errno) {
 	case EACCES:
-		my_putstr(": Permission denied.\n");
+		my_puterror(": Permission denied.\n");
 		break;
 	case ENOENT:
-		my_putstr(": No such file or directory.\n");
+		my_puterror(": No such file or directory.\n");
 		break;
 	case ENOTDIR:
-		my_putstr(": Not a directory.\n");
+		my_puterror(": Not a directory.\n");
 	}
 }
 
@@ -407,7 +412,7 @@ void my_exit(env_t **env, char **path, char **arg, char *cmd)
 	int value = 0;
 
 	if (tab_lengh(arg) > 2 || (tab_lengh(arg) != 1 && !my_str_isnum(arg[1]))) {
-		my_putstr("exit: Expression Syntax.\n");
+		my_puterror("exit: Expression Syntax.\n");
 	} else {
 		if (tab_lengh(arg) != 1)
 			value = my_getnbr(arg[1]);
@@ -600,8 +605,8 @@ void mysh(env_t **env, char *cmd)
 		if (good_path != NULL)
 			launch_programm(good_path, arg, *env);
 		else {
-			my_putstr(arg[0]);
-			my_putstr(": Command not found.\n");
+			my_puterror(arg[0]);
+			my_puterror(": Command not found.\n");
 		}
 		free(good_path);
 	}
