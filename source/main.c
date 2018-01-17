@@ -156,8 +156,8 @@ int is_env_valid(char *to_verif)
 {
 	int i = 0;
 
-	if (!(to_verif[0] >= 'a' && to_verif[0] <= 'z') || \
-	(to_verif[0] >= 'A' && to_verif[0] <= 'Z')) {
+	if (!((to_verif[0] >= 'a' && to_verif[0] <= 'z') ||	\
+	      (to_verif[0] >= 'A' && to_verif[0] <= 'Z'))) {
 		my_puterror("setenv: Variable name must begin with a letter.\n");
 		return (0);
 	}
@@ -190,23 +190,21 @@ int is_in_env_for_add(env_t *env, char *to_add)
         return (0);
 }
 
-void modifie_env_var(env_t *env, char *to_add)
+void modifie_env_var(env_t *env, char **to_add)
 {
         env_t *to_modifie;
-	char *var = get_env_varname(to_add);
-	char *final = my_malloc(my_strlen(var) + my_strlen(to_add) + 1);
+	char *final = my_malloc(my_strlen(to_add[1]) + my_strlen(to_add[2]) + 1);
 
 	while (env != NULL && to_modifie != NULL) {
-		if (is_in_env_entry(env->var, var))
+		if (is_in_env_entry(env->var, to_add[1]))
 			to_modifie = env;
 		env = env->next;
 	}
-        my_strcat(final, to_modifie->var);
-	my_strcat(final, ":");
-        my_strcat(final, to_add + my_strlen(var) + 1);
+        my_strcat(final, to_add[1]);
+	my_strcat(final, "=");
+        my_strcat(final, to_add[2]);
 	free(to_modifie->var);
 	to_modifie->var = final;
-	free(var);
 }
 
 void add_env_to_list(env_t **head, char *to_add, char *val)
@@ -274,9 +272,10 @@ void add_env_to_list_manager(env_t **head, char **arg)
 		return;
 	}
 	if ((my_getenv(*head, arg[1])) != NULL) {
-		//replace_env(head, arg);
-		remove_env(head, arg[1]);
-		add_env_to_list(head, arg[1], arg[2]);
+		modifie_env_var(*head, arg);
+//replace_env(head, arg);
+		//remove_env(head, arg[1]);
+		//add_env_to_list(head, arg[1], arg[2]);
 	} else
 		add_env_to_list(head, arg[1], arg[2]);
 }
