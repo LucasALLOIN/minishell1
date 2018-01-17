@@ -190,10 +190,10 @@ int is_in_env_for_add(env_t *env, char *to_add)
         return (0);
 }
 
-void modifie_env_var(env_t *env, char **to_add)
+void modifie_env_var(env_t *env, char **to_add, int empty)
 {
         env_t *to_modifie;
-	char *final = my_malloc(my_strlen(to_add[1]) + my_strlen(to_add[2]) + 1);
+	char *final = my_malloc(my_strlen(to_add[1]) + my_strlen((empty) ? "" : to_add[2]) + 1);
 
 	while (env != NULL && to_modifie != NULL) {
 		if (is_in_env_entry(env->var, to_add[1]))
@@ -202,7 +202,7 @@ void modifie_env_var(env_t *env, char **to_add)
 	}
         my_strcat(final, to_add[1]);
 	my_strcat(final, "=");
-        my_strcat(final, to_add[2]);
+        my_strcat(final, (empty) ? "" : to_add[2]);
 	free(to_modifie->var);
 	to_modifie->var = final;
 }
@@ -265,14 +265,15 @@ void add_env_to_list_manager(env_t **head, char **arg)
 		return;
 	if (tab_lengh(arg) == 2) {
                 if ((my_getenv(*head, arg[1])) != NULL) {
-                        remove_env(head, arg[1]);
-	                add_env_to_list(head, arg[1], "");
+			modifie_env_var(*head, arg, 1);
+//remove_env(head, arg[1]);
+	                //add_env_to_list(head, arg[1], "");
 	        } else
                         add_env_to_list(head, arg[1], "");
 		return;
 	}
 	if ((my_getenv(*head, arg[1])) != NULL) {
-		modifie_env_var(*head, arg);
+		modifie_env_var(*head, arg, 0);
 //replace_env(head, arg);
 		//remove_env(head, arg[1]);
 		//add_env_to_list(head, arg[1], arg[2]);
