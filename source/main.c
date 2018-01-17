@@ -404,7 +404,7 @@ void my_cd(char *path, env_t **env)
 
 int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 {
-	my_putstr(arg[0]);
+	//my_putstr(arg[0]);
 	if (my_strcmp(arg[0], "env") == 0) {
 		display_env(*env);
 		return (1);
