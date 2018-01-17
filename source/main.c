@@ -402,6 +402,24 @@ void my_cd(char *path, env_t **env)
         add_env_to_list(env, "PWD", getcwd(buf, 256));
 }
 
+void my_exit(env_t **env, char **path, char **arg, char *cmd)
+{
+	int value = 0;
+
+	if (tab_lengh(arg) > 2 || (tab_lengh(arg) != 1 && !my_str_isnum(arg[1]))) {
+		my_putstr("exit: Expression Syntax.\n");
+	} else {
+		if (tab_lengh(arg) != 1)
+			value = my_getnbr(arg[1]);
+		free(cmd);
+		free_env(env);
+		free_tab(arg);
+		free_tab(path);
+		my_putstr("exit\n");
+		exit(value % 256);
+	}
+}
+
 int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 {
 	//my_putstr(arg[0]);
@@ -409,12 +427,8 @@ int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 		display_env(*env);
 		return (1);
 	} else if (my_strcmp(arg[0], "exit") == 0) {
-		free(cmd);
-		free_env(env);
-		free_tab(arg);
-		free_tab(path);
-		my_putstr("exit\n");
-		exit(0);
+		my_exit(env, path, arg, cmd);
+		return (1);
 	} else if (my_strcmp(arg[0], "setenv") == 0) {
 		add_env_to_list_manager(env, arg);
 		return (1);
