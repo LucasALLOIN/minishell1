@@ -395,6 +395,7 @@ void my_cd(char *path, env_t **env)
 
 int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 {
+	//my_putstr(arg[0]);
 	if (my_strcmp(arg[0], "env") == 0) {
 		display_env(*env);
 		return (1);
@@ -487,7 +488,7 @@ char *get_real_path(char **arg, char **path)
 	if (arg[0][0] == '.' || arg[0][0] == '/') {
 	        res = my_malloc(len + 1);
 		my_strcpy(res, arg[0]);
-		return (res);
+		return ((access(res, X_OK) == 0) ? res : NULL);
 	}
 	for (int i = 0; path[i]; i = i + 1) {
 		res = my_malloc(len + my_strlen(path[i]) + 2);
