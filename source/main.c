@@ -274,6 +274,7 @@ void add_env_to_list_manager(env_t **head, char **arg)
 		return;
 	}
 	if ((my_getenv(*head, arg[1])) != NULL) {
+		//replace_env(head, arg);
 		remove_env(head, arg[1]);
 		add_env_to_list(head, arg[1], arg[2]);
 	} else
@@ -625,6 +626,8 @@ int my_is_dir(char *good_path)
 {
 	struct stat statbuf;
 
+	if (good_path == NULL)
+		return (0);
 	if (stat(good_path, &statbuf) != 0)
 		return (0);
 	return (S_ISDIR(statbuf.st_mode));
