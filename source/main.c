@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <errno.h>
 #include "gnl.h"
@@ -608,6 +609,15 @@ void tild_replacer(env_t *env, char **arg)
 	}
 }
 
+int my_is_dir(char *good_path)
+{
+	struct stat statbuf;
+
+	if (stat(good_path, &statbuf) != 0)
+		return (0);
+	return (S_ISDIR(statbuf.st_mode));
+}
+
 void mysh(env_t **env, char *cmd)
 {
 	char **arg = my_str_to_array(cmd, ' ');
@@ -619,9 +629,12 @@ void mysh(env_t **env, char *cmd)
 	tild_replacer(*env, arg);
 	if (!check_builtin(env, path, arg, cmd)) {
 		good_path = get_real_path(arg, path);
-		if (good_path != NULL)
+		if (good_path != NULL && !my_is_dir(good_path))
 			launch_programm(good_path, arg, *env);
-		else {
+		else if (my_is_dir(good_path)) {
+			my_puterror(arg[0]);
+			my_puterror(": Permission denied.\n");
+		} else {
 			my_puterror(arg[0]);
 			my_puterror(": Command not found.\n");
 		}
