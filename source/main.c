@@ -507,6 +507,18 @@ char **build_env_tab(env_t *list)
 	return (res);
 }
 
+int has_slash(char *cmd)
+{
+	int i = 0;
+
+	while (cmd[i]) {
+		if (cmd[i] == '/')
+			return (1);
+		i = i + 1;
+	}
+	return (0);
+}
+
 char *get_real_path(char **arg, char **path)
 {
 	char *res;
@@ -514,7 +526,7 @@ char *get_real_path(char **arg, char **path)
 
 	if (path == NULL)
 		return (NULL);
-	if (arg[0][0] == '.' || arg[0][0] == '/') {
+	if (has_slash(arg[0])) {
 	        res = my_malloc(len + 1);
 		my_strcpy(res, arg[0]);
 		return ((access(res, X_OK) == 0) ? res : NULL);
