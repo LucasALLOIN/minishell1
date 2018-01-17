@@ -369,7 +369,6 @@ int verify_path(char *path, env_t **env)
 	char buf[256];
 	DIR *dir;
         
-	(void) dir;
 	errno = 0;
 	if (path == NULL) {
 		remove_env(env, "OLDPWD");
@@ -383,6 +382,7 @@ int verify_path(char *path, env_t **env)
 	if (errno == 0 || my_strcmp(path, "-") == 0)
 		return (1);
 	display_cd_error(path);
+	closedir(dir);
 	return (0);
 }
 
@@ -539,6 +539,20 @@ int is_forking(int val)
 	return (is_forking);
 }
 
+void print_error_on_exec(int status)
+{
+	//my_put_nbr(status);
+	switch (status) {
+	case 11:
+	case 139:
+		my_puterror("Segmentation fault\n");
+		break;
+	case 8:
+	case 136:
+		my_puterror("Floating exception\n");
+	}
+}
+
 void launch_programm(char *good_path, char **arg, env_t *env)
 {
 	char **tab_env = build_env_tab(env);
@@ -551,10 +565,13 @@ void launch_programm(char *good_path, char **arg, env_t *env)
         } else {
 		is_forking(1);
 		tpid = wait(&status);
-		while (tpid != pid)
+		while (tpid != pid) {
 			tpid = wait(&status);
+		}
 		if (tpid == pid) {
 			is_forking(0);
+			print_error_on_exec(status);
+//my_put_nbr(status);
 			free(tab_env);
 			return;
 		}
