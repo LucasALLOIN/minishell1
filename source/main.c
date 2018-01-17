@@ -150,13 +150,21 @@ int is_env_valid(char *to_verif)
 {
 	int i = 0;
 
+	if (!(to_verif[0] >= 'a' && to_verif[0] <= 'z') || \
+	(to_verif[0] >= 'A' && to_verif[0] <= 'Z')) {
+		my_putstr("setenv: Variable name must begin with a letter.\n");
+		return (0);
+	}
 	while (to_verif[i]) {
 		if ((to_verif[i] >= 'a' && to_verif[i] <= 'z') || \
 		(to_verif[i] >= 'A' && to_verif[i] <= 'Z') || \
 		(to_verif[i] >= '0' && to_verif[i] <= '9'))
 			i = i + 1;
-		else
+		else {
+			my_putstr("setenv: Variable name must ");
+			my_putstr("contain alphanumeric characters.\n");
 			return (0);
+		}
 	}
 	return (1);
 }
@@ -243,13 +251,6 @@ int is_empty_setenv(env_t **head, char **arg)
 	if (tab_lengh(arg) == 1) {
 		display_env(*head);
 		return (1);
-	} else if (tab_lengh(arg) == 2) {
-		if ((my_getenv(*head, arg[1])) != NULL) {
-			remove_env(head, arg[1]);
-			add_env_to_list(head, arg[1], "");
-		} else
-			add_env_to_list(head, arg[1], "");
-		return (1);
 	}
 	return (0);
 }
@@ -258,6 +259,14 @@ void add_env_to_list_manager(env_t **head, char **arg)
 {
 	if (is_empty_setenv(head, arg) || !is_env_valid(arg[1]))
 		return;
+	if (tab_lengh(arg) == 2) {
+                if ((my_getenv(*head, arg[1])) != NULL) {
+                        remove_env(head, arg[1]);
+	                add_env_to_list(head, arg[1], "");
+	        } else
+                        add_env_to_list(head, arg[1], "");
+		return;
+	}
 	if ((my_getenv(*head, arg[1])) != NULL) {
 		remove_env(head, arg[1]);
 		add_env_to_list(head, arg[1], arg[2]);
@@ -395,7 +404,7 @@ void my_cd(char *path, env_t **env)
 
 int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 {
-	//my_putstr(arg[0]);
+	my_putstr(arg[0]);
 	if (my_strcmp(arg[0], "env") == 0) {
 		display_env(*env);
 		return (1);
