@@ -6,11 +6,12 @@
 ##
 
 SRC	=	source/main.c \
-		source/str_clear.c
+		source/str_clear.c \
+		source/get_next_line.c
 
 OBJ	=	$(SRC:.c=.o)
 
-CFLAGS	=	-Werror -Wextra -W -Wall -Wparentheses -Wsign-compare -Wpointer-sign -Wuninitialized -Wunused-but-set-variable -I ./include/ -L lib/ -lmy -lgnl -g
+CFLAGS	=	-Werror -Wextra -W -Wall -Wparentheses -Wsign-compare -Wpointer-sign -Wuninitialized -Wunused-but-set-variable -I ./include/ -L lib/ -lmy -g
 
 NAME	=	mysh
 

@@ -15,7 +15,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <string.h>
-#include "gnl.h"
+#include "get_next_line.h"
 #include "my.h"
 #include "main.h"
 
