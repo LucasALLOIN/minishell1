@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <errno.h>
+#include <string.h>
 #include "gnl.h"
 #include "my.h"
 #include "main.h"
@@ -555,8 +556,7 @@ int is_forking(int val)
 
 void print_error_on_exec(int status)
 {
-	//my_put_nbr(status);
-	switch (status) {
+        switch (status) {
 	case 11:
 	case 139:
 		my_puterror("Segmentation fault\n");
@@ -567,15 +567,28 @@ void print_error_on_exec(int status)
 	}
 }
 
+void display_error_on(char *path)
+{
+	switch (errno) {
+	case ENOEXEC:
+		my_puterror(path);
+		my_puterror(": Exec format error. Wrong Architecture.\n");
+		break;
+	default:
+		perror(path);
+	}
+}
+
 void launch_programm(char *good_path, char **arg, env_t *env)
 {
 	char **tab_env = build_env_tab(env);
 	pid_t pid = fork();
 	pid_t tpid;
 	int status;
-	
+
 	if (pid == 0) {
-		execve(good_path, arg, tab_env);
+		if (execve(good_path, arg, tab_env) == -1)
+			display_error_on(good_path);
         } else {
 		is_forking(1);
 		tpid = wait(&status);
@@ -585,7 +598,6 @@ void launch_programm(char *good_path, char **arg, env_t *env)
 		if (tpid == pid) {
 			is_forking(0);
 			print_error_on_exec(status);
-//my_put_nbr(status);
 			free(tab_env);
 			return;
 		}
