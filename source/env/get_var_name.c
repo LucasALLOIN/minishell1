@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** get_var_name
 ** File description:
-** main
+** get_var_name
 */
 
 #include <signal.h>
@@ -19,20 +19,15 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+char *get_var_name(char *var)
 {
-	char *s;
-	env_t *l_env = NULL;
+	char *res;
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (var[i] != '=')
+		i = i + 1;
+	res = malloc(i);
+	for (int z = 0; z < i; z = z + 1)
+		res[z] = var[z];
+	return (res);
 }

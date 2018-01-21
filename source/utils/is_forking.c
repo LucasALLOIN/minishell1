@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** is_forking
 ** File description:
-** main
+** is_forking
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int is_forking(int val)
 {
-	char *s;
-	env_t *l_env = NULL;
+	static int is_forking = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	if (val != 2)
+		is_forking = val;
+	return (is_forking);
 }

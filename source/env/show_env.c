@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** show_env
 ** File description:
-** main
+** show_env
 */
 
 #include <signal.h>
@@ -19,20 +19,13 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void show_env(char **env)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (env[i]) {
+		my_putstr(env[i]);
+		my_putchar('\n');
+		i = i + 1;
+	}
 }

@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** remove_from_env
 ** File description:
-** main
+** remove_from_env
 */
 
 #include <signal.h>
@@ -19,20 +19,15 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void remove_from_env(env_t **head, char **arg)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int i = 1;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (arg[i]) {
+		if (!is_unset_valid(arg[i]))
+			return;
+		else
+			remove_env(head, arg[i]);
+		i = i + 1;
+	}
 }

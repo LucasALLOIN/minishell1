@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** is_env
 ** File description:
-** main
+** is_env
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int is_env(env_t **env, char **arg)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
+	if (my_strcmp(arg[0], "env") == 0) {
+		display_env(*env);
+		return (1);
+	}
 	return (0);
 }

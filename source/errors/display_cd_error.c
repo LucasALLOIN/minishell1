@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** display_cd_error
 ** File description:
-** main
+** display_cd_error
 */
 
 #include <signal.h>
@@ -19,20 +19,17 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void display_cd_error(char *path)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	my_puterror(path);
+	switch (errno) {
+	case EACCES:
+		my_puterror(": Permission denied.\n");
+		break;
+	case ENOENT:
+		my_puterror(": No such file or directory.\n");
+		break;
+	case ENOTDIR:
+		my_puterror(": Not a directory.\n");
+	}
 }

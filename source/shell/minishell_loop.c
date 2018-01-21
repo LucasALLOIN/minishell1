@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** minishell_loop
 ** File description:
-** main
+** minishell_loop
 */
 
 #include <signal.h>
@@ -19,20 +19,16 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void minishell_loop(char *s, env_t *l_env)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (s) {
+		s = my_strclear(s);
+		if (check_cmd(s))
+			mysh(&l_env, s);
+		my_putstr("$> ");
+		free(s);
+		s = get_next_line(0);
+		if (s == NULL)
+			my_putstr("exit\n");
+	}
 }

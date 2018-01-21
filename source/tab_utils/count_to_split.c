@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** count_to_split
 ** File description:
-** main
+** count_to_split
 */
 
 #include <signal.h>
@@ -19,20 +19,12 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int count_to_split(char *cmd, char to_split)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int c = 1;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	for (int i = 0; cmd[i]; i = i + 1)
+		if (cmd[i] == to_split)
+			c = c + 1;
+	return (c);
 }

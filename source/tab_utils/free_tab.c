@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** free_tab
 ** File description:
-** main
+** free_tab
 */
 
 #include <signal.h>
@@ -19,20 +19,13 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void free_tab(char **tab)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	if (tab == NULL)
+		return;
+	for (i = 0; tab[i] != 0; i = i + 1)
+		free(tab[i]);
+	free(tab);
 }

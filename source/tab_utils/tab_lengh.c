@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** tab_lengh
 ** File description:
-** main
+** tab_lengh
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int tab_lengh(char **tab)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (tab[i])
+		i = i + 1;
+	return (i);
 }

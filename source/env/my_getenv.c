@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** my_getenv
 ** File description:
-** main
+** my_getenv
 */
 
 #include <signal.h>
@@ -19,20 +19,12 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+char *my_getenv(env_t *env, char *elem)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	for (; env != NULL; env = env->next) {
+		if (is_in_env_entry(env->var, elem)) {
+			return (env->var + my_strlen(elem) + 1);
+		}
+	}
+	return (NULL);
 }

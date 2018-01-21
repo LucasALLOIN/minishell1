@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** is_empty_setenv
 ** File description:
-** main
+** is_empty_setenv
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int is_empty_setenv(env_t **head, char **arg)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
+	if (tab_lengh(arg) == 1) {
+		display_env(*head);
+		return (1);
+	}
 	return (0);
 }

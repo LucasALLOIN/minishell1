@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** build_env_tab
 ** File description:
-** main
+** build_env_tab
 */
 
 #include <signal.h>
@@ -19,20 +19,16 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+char **build_env_tab(env_t *list)
 {
-	char *s;
-	env_t *l_env = NULL;
+	char **res = malloc(sizeof(char *) * (env_len(list) + 1));
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (list != NULL) {
+		res[i] = list->var;
+		i = i + 1;
+		list = list->next;
+	}
+	res[i] = 0;
+	return (res);
 }

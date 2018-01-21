@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** print_error_on_exec
 ** File description:
-** main
+** print_error_on_exec
 */
 
 #include <signal.h>
@@ -19,20 +19,15 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void print_error_on_exec(int status)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	switch (status) {
+	case 11:
+	case 139:
+		my_puterror("Segmentation fault\n");
+		break;
+	case 8:
+	case 136:
+		my_puterror("Floating exception\n");
+	}
 }

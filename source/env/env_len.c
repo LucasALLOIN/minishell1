@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** env_len
 ** File description:
-** main
+** env_len
 */
 
 #include <signal.h>
@@ -19,20 +19,13 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int env_len(env_t *list)
 {
-	char *s;
-	env_t *l_env = NULL;
+	int i = 0;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (list != NULL) {
+		list = list->next;
+		i = i + 1;
+	}
+	return (i);
 }

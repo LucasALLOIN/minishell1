@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** free_env
 ** File description:
-** main
+** free_env
 */
 
 #include <signal.h>
@@ -19,20 +19,14 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void free_env(env_t **env)
 {
-	char *s;
-	env_t *l_env = NULL;
+	env_t *last = *env;
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	while (*env != NULL) {
+		free((*env)->var);
+		last = *env;
+		*env = (*env)->next;
+		free(last);
+	}
 }

@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** check_builtin
 ** File description:
-** main
+** check_builtin
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int check_builtin(env_t **env, char **path, char **arg, char *cmd)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
+	if (is_exit(env, path, arg, cmd) || is_env(env, arg) \
+	|| is_setenv(env, arg) || is_unsetenv(env, arg) \
+	|| is_cd(env, arg))
+		return (1);
 	return (0);
 }

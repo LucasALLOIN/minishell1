@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** is_in_env_for_add
 ** File description:
-** main
+** is_in_env_for_add
 */
 
 #include <signal.h>
@@ -19,20 +19,17 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+int is_in_env_for_add(env_t *env, char *to_add)
 {
-	char *s;
-	env_t *l_env = NULL;
+	char *var = get_env_varname(to_add);
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
+	while (env != NULL) {
+		if (is_in_env_entry(env->var, var)) {
+			free(var);
+			return (1);
+		}
+		env = env->next;
+	}
+	free(var);
 	return (0);
 }

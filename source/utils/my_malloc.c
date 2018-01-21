@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** my_malloc
 ** File description:
-** main
+** my_malloc
 */
 
 #include <signal.h>
@@ -19,20 +19,11 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+char *my_malloc(unsigned int size)
 {
-	char *s;
-	env_t *l_env = NULL;
+	char *mall = malloc(size);
 
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	for (unsigned int i = 0; i < size; i = i + 1)
+		mall[i] = '\0';
+	return (mall);
 }

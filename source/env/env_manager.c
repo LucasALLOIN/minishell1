@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** main
+** env_manager
 ** File description:
-** main
+** env_manager
 */
 
 #include <signal.h>
@@ -19,20 +19,10 @@
 #include "my.h"
 #include "main.h"
 
-int main(int argc, char *argv[], char **env)
+void env_manager(env_t **head, char **arg)
 {
-	char *s;
-	env_t *l_env = NULL;
-
-	(void) argc;
-	(void) argv;
-	signal(SIGINT, &handler);
-	build_env_list(&l_env, env);
-	my_putstr("$> ");
-	s = get_next_line(0);
-	if (s == NULL)
-		my_putstr("exit\n");
-	minishell_loop(s, l_env);
-	free_env(&l_env);
-	return (0);
+	if ((my_getenv(*head, arg[1])) != NULL) {
+		modifie_env_var(*head, arg, 0);
+	} else
+		add_env_to_list(head, arg[1], arg[2]);
 }
