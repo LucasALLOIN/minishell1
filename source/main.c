@@ -157,9 +157,10 @@ int is_env_valid(char *to_verif)
 {
 	int i = 0;
 
-	if (!((to_verif[0] >= 'a' && to_verif[0] <= 'z') ||	\
-	      (to_verif[0] >= 'A' && to_verif[0] <= 'Z'))) {
-		my_puterror("setenv: Variable name must begin with a letter.\n");
+	if (!((to_verif[0] >= 'a' && to_verif[0] <= 'z') || \
+	(to_verif[0] >= 'A' && to_verif[0] <= 'Z'))) {
+		my_puterror("setenv: Variable name must begin with a letter.");
+		my_puterror("\n");
 		return (0);
 	}
 	while (to_verif[i]) {
@@ -194,8 +195,11 @@ int is_in_env_for_add(env_t *env, char *to_add)
 void modifie_env_var(env_t *env, char **to_add, int empty)
 {
         env_t *to_modifie;
-	char *final = my_malloc(my_strlen(to_add[1]) + my_strlen((empty) ? "" : to_add[2]) + 1);
+	int m_val;
+	char *final;
 
+	m_val = my_strlen(to_add[1]) + my_strlen((empty) ? "" : to_add[2]) + 1;
+	final = my_malloc(m_val);
 	while (env != NULL && to_modifie != NULL) {
 		if (is_in_env_entry(env->var, to_add[1]))
 			to_modifie = env;
@@ -260,6 +264,14 @@ int is_empty_setenv(env_t **head, char **arg)
 	return (0);
 }
 
+void env_manager(env_t **head, char **arg)
+{
+	if ((my_getenv(*head, arg[1])) != NULL) {
+		modifie_env_var(*head, arg, 0);
+	} else
+		add_env_to_list(head, arg[1], arg[2]);
+}
+
 void add_env_to_list_manager(env_t **head, char **arg)
 {
 	if (is_empty_setenv(head, arg) || !is_env_valid(arg[1]))
@@ -267,19 +279,11 @@ void add_env_to_list_manager(env_t **head, char **arg)
 	if (tab_lengh(arg) == 2) {
                 if ((my_getenv(*head, arg[1])) != NULL) {
 			modifie_env_var(*head, arg, 1);
-//remove_env(head, arg[1]);
-	                //add_env_to_list(head, arg[1], "");
-	        } else
+		} else
                         add_env_to_list(head, arg[1], "");
 		return;
 	}
-	if ((my_getenv(*head, arg[1])) != NULL) {
-		modifie_env_var(*head, arg, 0);
-//replace_env(head, arg);
-		//remove_env(head, arg[1]);
-		//add_env_to_list(head, arg[1], arg[2]);
-	} else
-		add_env_to_list(head, arg[1], arg[2]);
+	env_manager(head, arg);
 }
 
 int is_unset_valid(char *to_rm)
@@ -382,8 +386,10 @@ int verify_path(char *path, env_t **env)
 		return (0);
 	}
 	dir = opendir(path);
-	if (errno == 0 || my_strcmp(path, "-") == 0)
+	if (errno == 0 || my_strcmp(path, "-") == 0) {
+		closedir(dir);
 		return (1);
+	}
 	display_cd_error(path);
 	closedir(dir);
 	return (0);
@@ -414,7 +420,8 @@ void my_exit(env_t **env, char **path, char **arg, char *cmd)
 {
 	int value = 0;
 
-	if (tab_lengh(arg) > 2 || (tab_lengh(arg) != 1 && !my_str_isnum(arg[1]))) {
+	if (tab_lengh(arg) > 2 || (tab_lengh(arg) != 1 \
+	&& !my_str_isnum(arg[1]))) {
 		my_puterror("exit: Expression Syntax.\n");
 	} else {
 		if (tab_lengh(arg) != 1)
@@ -428,26 +435,58 @@ void my_exit(env_t **env, char **path, char **arg, char *cmd)
 	}
 }
 
-int check_builtin(env_t **env, char **path, char **arg, char *cmd)
+int is_exit(env_t **env, char **path, char **arg, char *cmd)
 {
-	//my_putstr(arg[0]);
+	if (my_strcmp(arg[0], "exit") == 0) {
+                my_exit(env, path, arg, cmd);
+                return (1);
+        }
+	return (0);
+}
+
+int is_env(env_t **env, char **arg)
+{
 	if (my_strcmp(arg[0], "env") == 0) {
 		display_env(*env);
 		return (1);
-	} else if (my_strcmp(arg[0], "exit") == 0) {
-		my_exit(env, path, arg, cmd);
-		return (1);
-	} else if (my_strcmp(arg[0], "setenv") == 0) {
+	}
+        return (0);
+}
+
+int is_setenv(env_t **env, char **arg)
+{
+	if (my_strcmp(arg[0], "setenv") == 0) {
 		add_env_to_list_manager(env, arg);
 		return (1);
-	} else if (my_strcmp(arg[0], "unsetenv") == 0) {
+	}
+        return (0);
+}
+
+int is_unsetenv(env_t **env, char **arg)
+{
+	if (my_strcmp(arg[0], "unsetenv") == 0) {
 		remove_from_env(env, arg);
 		return (1);
-	} else if (my_strcmp(arg[0], "cd") == 0) {
+	}
+        return (0);
+}
+
+int is_cd(env_t **env, char **arg)
+{
+	if (my_strcmp(arg[0], "cd") == 0) {
 		my_cd(arg[1], env);
 		return (1);
 	}
 	return (0);
+}
+
+int check_builtin(env_t **env, char **path, char **arg, char *cmd)
+{
+	if (is_exit(env, path, arg, cmd) || is_env(env, arg) \
+	|| is_setenv(env, arg) || is_unsetenv(env, arg) \
+	|| is_cd(env, arg))
+		return (1);
+        return (0);
 }
 
 int count_to_split(char *cmd, char to_split)
@@ -592,9 +631,8 @@ void launch_programm(char *good_path, char **arg, env_t *env)
         } else {
 		is_forking(1);
 		tpid = wait(&status);
-		while (tpid != pid) {
+		while (tpid != pid)
 			tpid = wait(&status);
-		}
 		if (tpid == pid) {
 			is_forking(0);
 			print_error_on_exec(status);
@@ -619,16 +657,16 @@ void tild_replacer(env_t *env, char **arg)
 {
 	int i = 0;
 	int ln = 0;
-	char *res;
+	char *r;
 
 	while (arg[i]) {
 		ln = my_strlen(arg[i]);
 		if (arg[i][0] == '~') {
-			res = malloc(my_strlen(my_getenv(env, "HOME")) + 1 + ln);
-			my_strcpy(res, my_getenv(env, "HOME"));
-			my_strcat(res, arg[i] + 1);
+			r = malloc(my_strlen(my_getenv(env, "HOME")) + 1 + ln);
+			my_strcpy(r, my_getenv(env, "HOME"));
+			my_strcat(r, arg[i] + 1);
 			free(arg[i]);
-			arg[i] = res;
+			arg[i] = r;
 		}
 		i = i + 1;
 	}
@@ -645,6 +683,19 @@ int my_is_dir(char *good_path)
 	return (S_ISDIR(statbuf.st_mode));
 }
 
+void cmd_handler(char *good_path, char **arg, env_t **env)
+{
+	if (good_path != NULL && !my_is_dir(good_path))
+		launch_programm(good_path, arg, *env);
+	else if (my_is_dir(good_path)) {
+		my_puterror(arg[0]);
+		my_puterror(": Permission denied.\n");
+	} else {
+		my_puterror(arg[0]);
+		my_puterror(": Command not found.\n");
+	}
+}
+
 void mysh(env_t **env, char *cmd)
 {
 	char **arg = my_str_to_array(cmd, ' ');
@@ -656,19 +707,25 @@ void mysh(env_t **env, char *cmd)
 	tild_replacer(*env, arg);
 	if (!check_builtin(env, path, arg, cmd)) {
 		good_path = get_real_path(arg, path);
-		if (good_path != NULL && !my_is_dir(good_path))
-			launch_programm(good_path, arg, *env);
-		else if (my_is_dir(good_path)) {
-			my_puterror(arg[0]);
-			my_puterror(": Permission denied.\n");
-		} else {
-			my_puterror(arg[0]);
-			my_puterror(": Command not found.\n");
-		}
+		cmd_handler(good_path, arg, env);
 		free(good_path);
 	}
 	free_tab(arg);
 	free_tab(path);
+}
+
+void minishell_loop(char *s, env_t *l_env)
+{
+	while (s) {
+		s = my_strclear(s);
+		if (check_cmd(s))
+			mysh(&l_env, s);
+		my_putstr("$> ");
+		free(s);
+		s = get_next_line(0);
+		if (s == NULL)
+			my_putstr("exit\n");
+	}
 }
 
 int main(int argc, char *argv[], char **env)
@@ -684,16 +741,7 @@ int main(int argc, char *argv[], char **env)
 	s = get_next_line(0);
 	if (s == NULL)
 		my_putstr("exit\n");
-	while (s) {
-		s = my_strclear(s);
-		if (check_cmd(s))
-			mysh(&l_env, s);
-		my_putstr("$> ");
-        	free(s);
-		s = get_next_line(0);
-		if (s == NULL)
-			my_putstr("exit\n");
-	}
+	minishell_loop(s, l_env);
 	free_env(&l_env);
         return (0);
 }

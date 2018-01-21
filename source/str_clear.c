@@ -36,15 +36,16 @@ char *my_strclear(char *str)
 	int i = 0;
 	int z = 0;
 	int check = 0;
+	int check2 = 0;
 	char *res = my_malloc(my_strlen(str) + 1);
 
 	while (str[i]) {
 		check = is_space_first(str, i);
-		if (is_next_space(str[i], str[i + 1]));
-		else if (str[i] == '\t' && check) {
+		check2 = is_next_space(str[i], str[i + 1]);
+	        if (str[i] == '\t' && check && !check2) {
 			res[z] = ' ';
 			z += 1;
-		} else if (check) {
+		} else if (check && !check2) {
 			res[z] = str[i];
 			z += 1;
 		}

@@ -11,10 +11,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include "main.h"
 
 char *my_cat(char *result, int *x, int *z, char *buffer)
 {
-	char *res = malloc(READ_SIZE * (x[1] + 1) + 1);
+	char *res = my_malloc(READ_SIZE * (x[1] + 1) + 1);
 	int y = 0;
 
 	x[1] += 1;
@@ -64,7 +65,7 @@ char *format_buffer(int *t, char *buffer, char *res)
 char *get_next_line(int fd)
 {
 	static char buffer[READ_SIZE + 1];
-	char *res = malloc(READ_SIZE + 1);
+	char *res = my_malloc(READ_SIZE + 1);
 	int t[2] = {0, 1};
 	static int a[2] = {0, -50};
 
