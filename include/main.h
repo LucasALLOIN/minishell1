@@ -1,5 +1,5 @@
 /*
-1;5002;0c** EPITECH PROJECT, 2018
+** EPITECH PROJECT, 2018
 ** Project mysh
 ** File description:
 ** Header file
